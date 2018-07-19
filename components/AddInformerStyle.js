@@ -2,8 +2,6 @@ import { StyleSheet } from 'react-native';
 
 var Style = StyleSheet.create({
     rootContainer: {
-        flex: 1,
-        backgroundColor: "#ffffff"
     },
 
     formHeader: {
@@ -22,8 +20,6 @@ var Style = StyleSheet.create({
         fontSize: 16,
         paddingBottom: 5,
         paddingLeft: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#dadada'
     },
 });
 
