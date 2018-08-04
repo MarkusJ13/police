@@ -1,32 +1,40 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { createStackNavigator } from 'react-navigation';
 import Login from './Login.js';
+import VerifyPhone from './VerifyPhone.js';
 import AddInformer from './AddInformer.js';
-import Style from './DashboardStyle.js';
-import { DB_CONFIG } from './config/FirebaseConfig.js';
+
+const RootStack = createStackNavigator(
+	{
+		Login: {
+			screen: Login,
+			navigationOptions: {
+				header: null,
+			}
+		},
+		Verification: {
+			screen: VerifyPhone,
+			navigationOptions: {
+				header: null,
+			}
+		},
+		AddInformer: {
+			screen: AddInformer,
+			navigationOptions: {
+				header: null,
+			}
+		},
+	},
+	{
+	initialRouteName: 'Login',
+	},
+	{ 
+	headerMode: 'screen' 
+	}
+);
 
 export default class Dashboard extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			isLoggedIn: true
-		}
-	}
-
-    login = () => {
-    	this.setState({isLoggedIn: true})
-    }
-
-    logout = () => {
-    	this.setState({isLoggedIn: false})
-    }
-
 	render() {
-		let {isLoggedIn} = this.state
-		return (
-			<View style={Style.rootContainer}>
-				{isLoggedIn?<AddInformer updateLogout={this.logout}/>:<Login updateLogin={this.login}/>}
-			</View>
-		);
+		return <RootStack />;
 	}
 }
