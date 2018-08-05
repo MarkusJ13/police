@@ -67,3 +67,10 @@ export function updateInformerPhone(phone) {
 		phone: phone
 	};
 }
+
+export function updateSession(session) {
+	return {
+		type: "UPDATE_SESSION",//export this in some file
+		session: session
+	};
+}

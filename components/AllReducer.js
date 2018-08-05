@@ -8,7 +8,8 @@ const AllReducer = (state = {
 	beet: '',
 	stations: {},
 	informerName: '',
-	informerPhone: ''
+	informerPhone: '',
+	session: ''
 },action) => {
 	switch (action.type) {
 		case "UPDATE_SEARCH_ERROR":
@@ -40,6 +41,9 @@ const AllReducer = (state = {
 
 		case "UPDATE_INFORMER_PHONE":
 			return Object.assign({}, state, {informerPhone: action.phone});
+
+		case "UPDATE_SESSION":
+			return Object.assign({}, state, {session: action.session});
 
 		default:
 			return state;

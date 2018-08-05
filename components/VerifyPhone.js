@@ -5,13 +5,40 @@ import { Button, Header } from 'react-native-elements';
 import CodeInput from 'react-native-code-input';
 import SearchError from './SearchError.js';
 
+import { updateSearchError } from './AllAction.js';
+
 class VerifyPhone extends React.PureComponent {
-	login = () => {
-		this.props.navigation.navigate('AddInformer')
+	constructor(props) {
+		super(props);
+		this.code = ''
 	}
 
-	_onFulfill = (code) => {
+	login = () => {
+		let {session} = this.props
+		let code = this.code
+		console.log("check session", this.props.session)
+		console.log('url', 'https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/VERIFY/' + session + '/' + code)
+		fetch('https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/VERIFY/' + session + '/' + code)
+		.then((response) => response.json())
+		.then((responseJson) => {
+			console.log("check out", responseJson)
+			if(responseJson.Details === 'OTP Matched'){
+				this.props.navigation.navigate('AddInformer')
+			}else if(responseJson.Details === 'OTP Mismatch'){
+				this.props.updateSearchError({msg: 'Token Mismatch', msgColor: '#ff0000'})
+			}else if(responseJson.Details === 'OTP Expired'){
+				this.props.updateSearchError({msg: 'Token Expired', msgColor: '#ff0000'})
+			}
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+		//this.props.navigation.navigate('AddInformer')
+	}
 
+	_onFulfill = code => {
+		this.code = code
+		this.props.updateSearchError({msg: '', msgColor: '#000000'})
 	}
 
 	render() {
@@ -28,8 +55,8 @@ class VerifyPhone extends React.PureComponent {
 							secureTextEntry
 							borderType={'underline'}
 							space={10}
-							size={50}
-							codeLength={4}
+							size={40}
+							codeLength={6}
 							inputPosition='left'
 							activeColor='rgba(49, 180, 4, 1)'
 	      					inactiveColor='rgba(49, 180, 4, 1.3)'
@@ -52,4 +79,18 @@ class VerifyPhone extends React.PureComponent {
 	}
 }
 
-export default VerifyPhone;
+const mapStateToProps = (state) => {
+	return {
+		session: state.session
+	}
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		updateSearchError: (error) => {
+			dispatch(updateSearchError(error))
+		}
+	}
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(VerifyPhone);

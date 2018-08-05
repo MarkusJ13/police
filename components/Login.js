@@ -9,7 +9,7 @@ import BadgeNumber from './BadgeNumber.js';
 import PhoneNumber from './PhoneNumber.js';
 import SearchError from './SearchError.js';
 
-import {updateSearchError} from './AllAction.js';
+import {updateSearchError, updateSession} from './AllAction.js';
 
 class Login extends React.PureComponent {
 	constructor(props) {
@@ -44,6 +44,19 @@ class Login extends React.PureComponent {
 				}
 			}
 			if(found){
+				// console.log('url', 'https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/' + phone + '/AUTOGEN')
+				fetch('https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/' + phone + '/AUTOGEN')
+				.then((response) => response.json())
+				.then((responseJson) => {
+					if(responseJson.Status !== 'Error'){
+						self.props.updateSession(responseJson.Details)
+						responseJson.Details
+						self.props.navigation.navigate('Verification')
+					}
+				})
+				.catch((error) => {
+					console.error(error);
+				});
 				self.props.navigation.navigate('Verification')
 			}
 			else{
@@ -53,10 +66,6 @@ class Login extends React.PureComponent {
 			self.props.updateSearchError({msg: 'user not found! Error', msgColor: '#ff0000'})
 			console.log("The read failed: " + errorObject.code);
 		});
-	}
-
-	login = () => {
-		this.props.navigation.navigate('Query')
 	}
 
 	_onFulfill = (code) => {
@@ -98,6 +107,9 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		updateSearchError: (error) => {
 			dispatch(updateSearchError(error))
+		},
+		updateSession: (session) => {
+			dispatch(updateSession(session))
 		}
 	}
 };
