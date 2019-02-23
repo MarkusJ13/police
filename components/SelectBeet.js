@@ -54,7 +54,14 @@ class SelectBeet extends React.Component {
 	render() {
 		let Beet = this.getBeet()
 		let {stations, thana, chauki, beet} = this.props
-		let beetName = stations[thana] && stations[thana].child[chauki] && stations[thana].child[chauki].child[beet]?stations[thana].child[chauki].child[beet].name:''
+		let beetName = ''
+		if (stations && stations[thana]){
+			if(stations[thana].child && stations[thana].child[chauki]){
+				if(stations[thana].child[chauki].child && stations[thana].child[chauki].child[beet]){
+					beetName = stations[thana].child[chauki].child[beet].name
+				}
+			}
+		}
 		return (
 		<View>
 			<TouchableOpacity onPress={this.selectBeet}>
@@ -62,7 +69,7 @@ class SelectBeet extends React.Component {
 				label='Beet'
 				value={beetName}
 				editable={false}
-				/>
+			/>
 			</TouchableOpacity>
 			<ModalFilterPicker
 				visible={this.state.selectBeet}
@@ -70,6 +77,7 @@ class SelectBeet extends React.Component {
 				onCancel={this.selectBeet}
 				options={Beet}
 				optionTextStyle={{fontSize: 14}}
+				placeholderText="Beet"
 			/>
 		</View>
 		);

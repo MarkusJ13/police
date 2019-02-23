@@ -1,78 +1,51 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import { View } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Button, Header } from 'react-native-elements';
 import firebase from 'firebase';
 import 'firebase/database';
+import 'firebase/auth';
 
-import BadgeNumber from './BadgeNumber.js';
+import Password from './Password.js';
 import PhoneNumber from './PhoneNumber.js';
 import SearchError from './SearchError.js';
 
 import {updateSearchError, updateSession} from './AllAction.js';
+import { AsyncStorage } from "react-native";
 
 class Login extends React.PureComponent {
 	constructor(props) {
 		super(props);
+		this.state = {
+			buttonText: 'LOGIN'
+		}
 		let usersDb = firebase.database().ref().child('users')
 		this.usersDb = usersDb
 	}
 
-	verifyNumber = () => {
-		if(!this.props.badge){
-			this.props.updateSearchError({msg: 'Please enter badge number', msgColor: '#ff0000'})
-		}else if(!this.props.phone){
-			this.props.updateSearchError({msg: 'Please enter phone number', msgColor: '#ff0000'})
+	login = () => {
+		let {phone, password} = this.props
+		if(password === ''){
+			this.props.updateSearchError({msg: 'Please enter password', msgColor: '#ff0000'})
 		}else{
-			this.verifyUser()
+			let email = phone + '@informer.com'
+			let self = this
+			let auth = firebase.auth()
+			this.setState({buttonText: "LOGGING IN..."})
+			self.props.updateSearchError({msg: '', msgColor: '#ffffff'})
+			auth.signInWithEmailAndPassword(email, password).then(function(user) {
+				self.setState({buttonText: "LOGIN"})
+				self.props.navigation.navigate('Tabs')
+				AsyncStorage.setItem('phone', phone);
+			}).catch(function(error) {
+				self.props.updateSearchError({msg: 'Password incorrect or not set', msgColor: '#ff0000'})
+				self.setState({buttonText: "LOGIN"})
+			})
 		}
 	}
 
-	verifyUser = () => {
-		let {badge, phone} = this.props
-		let self = this
-		const usersRef = this.usersDb.orderByChild("badge").equalTo(badge);
-		usersRef.on("value", function(snapshot) {
-			let users = snapshot.val()
-			let found = false
-			for(var key in users) {
-				if(found){
-					continue
-				}
-				if(users[key].badge && users[key].badge === badge && users[key].phone && users[key].phone === phone){
-					found = true
-				}
-			}
-			if(found){
-				// console.log('url', 'https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/' + phone + '/AUTOGEN')
-				fetch('https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/' + phone + '/AUTOGEN')
-				.then((response) => response.json())
-				.then((responseJson) => {
-					if(responseJson.Status !== 'Error'){
-						self.props.updateSession(responseJson.Details)
-						responseJson.Details
-						self.props.navigation.navigate('Verification')
-					}
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-				self.props.navigation.navigate('Verification')
-			}
-			else{
-				self.props.updateSearchError({msg: 'user not found!', msgColor: '#ff0000'})
-			}
-		}, function (errorObject) {
-			self.props.updateSearchError({msg: 'user not found! Error', msgColor: '#ff0000'})
-			console.log("The read failed: " + errorObject.code);
-		});
-	}
-
-	_onFulfill = (code) => {
-
-	}
-
 	render() {
+		let {buttonText} = this.state
 		return (
 			<View style={{flex: 1, backgroundColor: 'white'}}>
 				<Header
@@ -80,16 +53,21 @@ class Login extends React.PureComponent {
 					outerContainerStyles={{borderBottomWidth: 0, height: 85, backgroundColor: "#ff0f0f"}}
 				/>
 				<View style={{margin: 10}}>
-					<BadgeNumber />
 					<PhoneNumber />
+					<Password />
 					<View style={{top: 10}}>
 						<Button
-							title='LOGIN'
+							title={buttonText}
 							backgroundColor="#ff0f0f"
-							onPress={this.verifyNumber}
+							onPress={this.login}
 						/>
 						<SearchError />
 					</View>
+				</View>
+				<View style={{position: 'absolute', bottom: 10, width: '100%'}}>
+				<TouchableOpacity style={{margin: 20, padding: 15}} onPress={() => {this.props.navigation.navigate('ResetPassword')}}>
+					<Text style={{textAlign: 'center', textDecorationLine: 'underline'}}>Reset Password</Text>
+				</TouchableOpacity>
 				</View>
 			</View>
 		);
@@ -98,8 +76,8 @@ class Login extends React.PureComponent {
 
 const mapStateToProps = (state) => {
 	return {
-		badge: state.badge,
-		phone: state.phone
+		phone: state.phone,
+		password: state.password
 	}
 };
 

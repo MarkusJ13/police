@@ -1,6 +1,9 @@
 const AllReducer = (state = {
 	badge: '',
 	phone: '',
+	password: '',
+	newpassword: '',
+	reenterpassword: '',
 	searchError: {msg: '', msgColor: '#000000'},
 	showMenu: false,
 	thana: '',
@@ -35,6 +38,15 @@ const AllReducer = (state = {
 
 		case "UPDATE_PHONE":
 			return Object.assign({}, state, {phone: action.phone});
+
+		case "UPDATE_PASSWORD":
+			return Object.assign({}, state, {password: action.password});
+
+		case "UPDATE_NEW_PASSWORD":
+			return Object.assign({}, state, {newpassword: action.newpassword});
+
+		case "UPDATE_REENTER_PASSWORD":
+			return Object.assign({}, state, {reenterpassword: action.reenterpassword});
 
 		case "UPDATE_INFORMER_NAME":
 			return Object.assign({}, state, {informerName: action.name});

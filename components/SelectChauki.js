@@ -49,7 +49,12 @@ class SelectChauki extends React.Component {
 	render() {
 		let Chauki = this.getChauki()
 		let {stations, thana, chauki} = this.props
-		let chaukiName = stations[thana] && stations[thana].child[chauki]?stations[thana].child[chauki].name:''
+		let chaukiName = ''
+		if(stations && stations[thana]){
+			if(stations[thana].child && stations[thana].child[chauki]){
+				chaukiName = stations[thana].child[chauki].name
+			}
+		}
 		return (
 		<View>
 			<TouchableOpacity onPress={this.selectChauki}>
@@ -65,6 +70,7 @@ class SelectChauki extends React.Component {
 				onCancel={this.selectChauki}
 				options={Chauki}
 				optionTextStyle={{fontSize: 14}}
+				placeholderText="Chauki"
 			/>
 		</View>
 		);

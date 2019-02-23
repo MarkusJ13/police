@@ -38,7 +38,7 @@ class SelectThana extends React.PureComponent {
 	render() {
 		let Thana = this.getThana()
 		let {stations, thana} = this.props
-		let thanaName = stations[thana]?stations[thana].name:''
+		let thanaName = stations&&stations[thana]?stations[thana].name:''
 		return (
 		<View>
 			<TouchableOpacity onPress={this.selectThana}>
@@ -54,6 +54,7 @@ class SelectThana extends React.PureComponent {
 				onCancel={this.selectThana}
 				options={Thana}
 				optionTextStyle={{fontSize: 14}}
+				placeholderText="Chauki"
 			/>
 		</View>
 		);

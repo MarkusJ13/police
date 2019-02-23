@@ -6,8 +6,6 @@ import MenuOptions from './MenuOptions/MenuOptions.js';
 import Style from './AddInformerStyle.js';
 import { TextField } from 'react-native-material-textfield';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
-import firebase from 'firebase';
-import 'firebase/database';
 
 import InformerName from './InformerName.js';
 import InformerPhone from './InformerPhone.js';
@@ -16,7 +14,10 @@ import SelectChauki from './SelectChauki.js';
 import SelectBeet from './SelectBeet.js';
 import SearchError from './SearchError.js';
 
-import {updateSearchError, updateMenu, updateStations, updateInformerName, updateInformerPhone, updateThana, updateChauki, updateBeet} from './AllAction.js';
+import firebase from 'firebase';
+import 'firebase/database';
+
+import {updateSearchError, updateMenu, updateInformerName, updateInformerPhone, updateThana, updateChauki, updateBeet} from './AllAction.js';
 
 class ShowOption extends React.PureComponent {
 	render() {
@@ -49,20 +50,8 @@ class HeaderView extends React.PureComponent {
 class AddInformer extends React.Component {
 	constructor(props) {
 		super(props);
-		let stationsDb = firebase.database().ref().child('stations')
-		this.stationsDb = stationsDb
 		let informersDb = firebase.database().ref().child('informers')
 		this.informersDb = informersDb
-	}
-
-	componentWillMount(){
-		let self = this
-		this.stationsDb.on("value", function(snapshot) {
-			let stations = snapshot.val() 
-			self.props.updateStations(stations)
-		}, function (errorObject) {
-			console.log("The read failed: " + errorObject.code);
-		});
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
@@ -110,20 +99,13 @@ class AddInformer extends React.Component {
 	render() {
 		return (
 			<KeyboardAvoidingView style={{flex: 1, height: '100%'}}>
-			<ScrollView keyboardShouldPersistTaps="always">
-				<Header
-					centerComponent={<HeaderView />}
-					rightComponent={<ShowOption toggleMenu={this.toggleMenu}/>}
-					outerContainerStyles={{borderBottomWidth: 0, height: 85, backgroundColor: "#ff0f0f"}}
-				/>
-				
 				<ScrollView style={Style.formHeader} keyboardShouldPersistTaps="always">
 					<InformerName />
 					<InformerPhone />
 					<Text style={Style.formHeaderText}>Select Region</Text>
-					<SelectThana />
-					<SelectChauki />
 					<SelectBeet />
+					<SelectChauki />
+					<SelectThana />
 
 					<View style={{}}>
 						<Button
@@ -134,12 +116,6 @@ class AddInformer extends React.Component {
 						<SearchError />
 					</View>
 				</ScrollView>
-      		</ScrollView>
-      		<MenuOptions
-				toggleMenu={this.toggleMenu}
-				updateLogout={this.props.updateLogout}
-				navigation={this.props.navigation}
-			/>
       		</KeyboardAvoidingView>
 		);
 	}
@@ -159,12 +135,6 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		updateSearchError: (error) => {
 			dispatch(updateSearchError(error))
-		},
-		updateMenu: (menu) => {
-			dispatch(updateMenu(menu))
-		},
-		updateStations: (stations) => {
-			dispatch(updateStations(stations))
 		},
 		updateInformerName: (name) => {
 			dispatch(updateInformerName(name))

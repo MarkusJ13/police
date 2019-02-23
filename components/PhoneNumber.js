@@ -2,8 +2,17 @@ import React from 'react';
 import {connect} from 'react-redux';
 import { TextField } from 'react-native-material-textfield';
 import {updateSearchError, updatePhone} from './AllAction.js';
+import { AsyncStorage } from "react-native";
 
 class PhoneNumber extends React.PureComponent {
+	constructor(){
+		super()
+		let self = this
+		AsyncStorage.getItem('phone', (err, result) => {
+			if(result) self.props.updatePhone(result)
+		});
+	}
+
 	handlePhone = (p) => {
 		this.props.updatePhone(p)
 		this.props.updateSearchError({msg: '', msgColor: '#000000'})

@@ -2,7 +2,9 @@ import React from 'react';
 import { createStackNavigator } from 'react-navigation';
 import Login from './Login.js';
 import VerifyPhone from './VerifyPhone.js';
-import AddInformer from './AddInformer.js';
+import Tabs from './Tabs.js';
+import SearchResults from './SearchResult/SearchResult.js';
+import ResetPassword from './ResetPassword.js';
 
 const RootStack = createStackNavigator(
 	{
@@ -18,8 +20,20 @@ const RootStack = createStackNavigator(
 				header: null,
 			}
 		},
-		AddInformer: {
-			screen: AddInformer,
+		Tabs: {
+			screen: Tabs,
+			navigationOptions: {
+				header: null,
+			}
+		},
+		Results: {
+			screen: SearchResults,
+			navigationOptions: {
+				header: null,
+			}
+		},
+		ResetPassword: {
+			screen: ResetPassword,
 			navigationOptions: {
 				header: null,
 			}

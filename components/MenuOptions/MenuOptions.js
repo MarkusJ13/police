@@ -13,7 +13,8 @@ class MenuOptions extends React.PureComponent {
 
     logout = () => {//sync
     	this.props.updateBadge('')
-    	this.props.updatePhone('')
+		this.props.updatePhone('')
+		this.props.toggleMenu(false)
     	this.props.navigation.popToTop()
     }
 

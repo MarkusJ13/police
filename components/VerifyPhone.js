@@ -3,7 +3,13 @@ import {connect} from 'react-redux';
 import { View } from 'react-native';
 import { Button, Header } from 'react-native-elements';
 import CodeInput from 'react-native-code-input';
+
+import NewPassword from './NewPassword.js';
+import ReenterPassword from './ReenterPassword.js';
 import SearchError from './SearchError.js';
+import firebase from 'firebase';
+import 'firebase/database';
+import 'firebase/auth';
 
 import { updateSearchError } from './AllAction.js';
 
@@ -14,26 +20,40 @@ class VerifyPhone extends React.PureComponent {
 	}
 
 	login = () => {
-		let {session} = this.props
+		let self = this
+		let {session, phone} = this.props
 		let code = this.code
-		console.log("check session", this.props.session)
-		console.log('url', 'https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/VERIFY/' + session + '/' + code)
+		let {newpassword, reenterpassword} = this.props
+		if(newpassword !== reenterpassword){
+			this.props.updateSearchError({msg: 'Passwords do not match!', msgColor: '#ff0000'})
+		}
+		else{
 		fetch('https://2factor.in/API/V1/0d8e811c-98cf-11e8-a895-0200cd936042/SMS/VERIFY/' + session + '/' + code)
 		.then((response) => response.json())
 		.then((responseJson) => {
-			console.log("check out", responseJson)
 			if(responseJson.Details === 'OTP Matched'){
-				this.props.navigation.navigate('AddInformer')
+				let auth = firebase.auth()
+				let email = phone + '@informer.com'
+				auth.createUserWithEmailAndPassword(email, newpassword).then(function(user) {
+					self.props.navigation.popToTop()
+				}).catch(function(error) {
+					if(error.message === 'The email address is already in use by another account.'){
+						self.props.updateSearchError({msg: 'Update password not handled yet', msgColor: '#ff0000'})
+					}else{
+						self.props.updateSearchError({msg: error.message, msgColor: '#ff0000'})
+					}
+				})
 			}else if(responseJson.Details === 'OTP Mismatch'){
-				this.props.updateSearchError({msg: 'Token Mismatch', msgColor: '#ff0000'})
+				self.props.updateSearchError({msg: 'Token Mismatch', msgColor: '#ff0000'})
 			}else if(responseJson.Details === 'OTP Expired'){
-				this.props.updateSearchError({msg: 'Token Expired', msgColor: '#ff0000'})
+				self.props.updateSearchError({msg: 'Token Expired', msgColor: '#ff0000'})
 			}
 		})
 		.catch((error) => {
 			console.error(error);
 		});
-		//this.props.navigation.navigate('AddInformer')
+			
+		}
 	}
 
 	_onFulfill = code => {
@@ -45,11 +65,11 @@ class VerifyPhone extends React.PureComponent {
 		return (
 			<View style={{flex: 1, backgroundColor: 'white'}}>
 				<Header
-					centerComponent={{ text: 'Login', style: { fontSize: 20, color: '#fff'}}}
+					centerComponent={{ text: 'Reset Password', style: { fontSize: 20, color: '#fff'}}}
 					outerContainerStyles={{borderBottomWidth: 0, height: 85, backgroundColor: "#ff0f0f"}}
 				/>
 				<View style={{margin: 10}}>
-					<View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+					<View style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 50}}>
 						<CodeInput
 							ref="codeInputRef1"
 							secureTextEntry
@@ -65,7 +85,9 @@ class VerifyPhone extends React.PureComponent {
 							onFulfill={(code) => this._onFulfill(code)}
 						/>
 					</View>
-					<View style={{top: 100}}>
+					<NewPassword />
+					<ReenterPassword />
+					<View style={{top: 10}}>
 						<Button
 							title='Submit'
 							backgroundColor="#ff0f0f"
@@ -81,6 +103,9 @@ class VerifyPhone extends React.PureComponent {
 
 const mapStateToProps = (state) => {
 	return {
+		phone: state.phone,
+		newpassword: state.newpassword,
+		reenterpassword: state.reenterpassword,
 		session: state.session
 	}
 };

@@ -54,6 +54,27 @@ export function updatePhone(phone) {
 	};
 }
 
+export function updatePassword(password) {
+	return {
+		type: "UPDATE_PASSWORD",//export this in some file
+		password: password
+	};
+}
+
+export function updateNewPassword(newpassword) {
+	return {
+		type: "UPDATE_NEW_PASSWORD",//export this in some file
+		newpassword: newpassword
+	};
+}
+
+export function updateReenterPassword(reenterpassword) {
+	return {
+		type: "UPDATE_REENTER_PASSWORD",//export this in some file
+		reenterpassword: reenterpassword
+	};
+}
+
 export function updateInformerName(name) {
 	return {
 		type: "UPDATE_INFORMER_NAME",//export this in some file
